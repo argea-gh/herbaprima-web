@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET: Ambil semua produk
 export async function GET(request: NextRequest, context: any) {
   try {
-    const { results } = await context.env.DB.prepare(
+    const { results } = await (context as any).env.DB.prepare(
       "SELECT * FROM products ORDER BY created_at DESC"
     ).all();
     return NextResponse.json(results);
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, context: any) {
     const body = await request.json();
     const { name, slug, description, price, stock, image_url } = body;
 
-    const stmt = context.env.DB.prepare(
+    const stmt = (context as any).env.DB.prepare(
       `INSERT INTO products (name, slug, description, price, stock, image_url) 
        VALUES (?, ?, ?, ?, ?, ?)`
     );
