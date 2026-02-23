@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { D1Database } from '@cloudflare/workers-types';
-
-// Interface untuk Context Cloudflare
-interface Context {
-  env: {
-    DB: D1Database;
-  };
-}
 
 // GET: Ambil semua produk
-export async function GET(request: NextRequest, context: Context) {
+export async function GET(request: NextRequest, context: any) {
   try {
     const { results } = await context.env.DB.prepare(
       "SELECT * FROM products ORDER BY created_at DESC"
@@ -21,7 +13,7 @@ export async function GET(request: NextRequest, context: Context) {
 }
 
 // POST: Tambah produk baru
-export async function POST(request: NextRequest, context: Context) {
+export async function POST(request: NextRequest, context: any) {
   try {
     const body = await request.json();
     const { name, slug, description, price, stock, image_url } = body;
