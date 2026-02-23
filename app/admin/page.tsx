@@ -12,16 +12,17 @@ export default function AdminPage() {
     image_url: ''
   });
 
-  // Load products saat halaman dibuka
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
+  // ✅ PINDAHKAN FUNGSI INI KE ATAS (sebelum useEffect)
   const fetchProducts = async () => {
     const res = await fetch('/api/products');
     const data = await res.json();
     setProducts(data);
   };
+
+  // Load products saat halaman dibuka
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +62,7 @@ export default function AdminPage() {
       {/* List Produk */}
       <h2 className="text-xl font-semibold mb-4">Daftar Produk</h2>
       <div className="grid gap-4">
-        {products.map((p: any) => (
+        {products.map((p: { id: number; name: string; stock: number; price: number }) => (
           <div key={p.id} className="border p-4 rounded flex justify-between items-center">
             <div>
               <h3 className="font-bold">{p.name}</h3>
