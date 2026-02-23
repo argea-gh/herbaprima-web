@@ -1,0 +1,40 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { D1Database } from '@cloudflare/workers-types';
+
+// Interface untuk Context Cloudflare
+interface Context {
+  env: {
+    DB: D1Database;
+  };
+}
+
+// GET: Ambil semua produk
+export async function GET(request: NextRequest, context: Context) {
+  try {
+    const { results } = await context.env.DB.prepare(
+      "SELECT * FROM products ORDER BY created_at DESC"
+    ).all();
+    return NextResponse.json(results);
+  } catch (error) {
+    return NextResponse.json({ error: "Gagal mengambil data" }, { status: 500 });
+  }
+}
+
+// POST: Tambah produk baru
+export async function POST(request: NextRequest, context: Context) {
+  try {
+    const body = await request.json();
+    const { name, slug, description, price, stock, image_url } = body;
+
+    const stmt = context.env.DB.prepare(
+      `INSERT INTO products (name, slug, description, price, stock, image_url) 
+       VALUES (?, ?, ?, ?, ?, ?)`
+    );
+    
+    await stmt.bind(name, slug, description, price, stock, image_url).run();
+
+    return NextResponse.json({ message: "Produk berhasil ditambahkan" }, { status: 201 });
+  } catch (error) {
+    return NextResponse.json({ error: "Gagal menambah produk" }, { status: 500 });
+  }
+}

@@ -1,0 +1,8 @@
+name = "herbaprima"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = ".vercel/output/static"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "herbaprima-db"
+database_id = "b2e3cd1b-4744-447f-b51a-244b77494cfd"
