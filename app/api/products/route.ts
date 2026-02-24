@@ -1,5 +1,6 @@
-// Updated: 2026-02-23 - Fix context type for Cloudflare Pages
 import { NextRequest, NextResponse } from 'next/server';
+
+export const runtime = 'edge';  // ← TAMBAHKAN BARIS INI!
 
 export async function GET(request: NextRequest, context: any) {
   const db = (context as any).env.DB;
