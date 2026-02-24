@@ -1,8 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  stock: number;
+  image_url: string;
+  created_at: string;
+}
+
 export default function AdminPage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -11,66 +22,207 @@ export default function AdminPage() {
     stock: '',
     image_url: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  // ✅ PINDAHKAN FUNGSI INI KE ATAS (sebelum useEffect)
   const fetchProducts = async () => {
-    const res = await fetch('/api/products');
-    const data = await res.json();
-    setProducts(data);
+    try {
+      const res = await fetch('/api/products');
+      const data = await res.json();
+      setProducts(data);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    }
   };
 
-  // Load products saat halaman dibuka
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formData,
-        price: Number(formData.price),
-        stock: Number(formData.stock)
-      }),
-    });
-    alert('Produk berhasil ditambahkan!');
-    fetchProducts();
-    // Reset form
-    setFormData({ name: '', slug: '', description: '', price: '', stock: '', image_url: '' });
+    setLoading(true);
+    setMessage('');
+    
+    try {
+      await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          price: Number(formData.price),
+          stock: Number(formData.stock)
+        }),
+      });
+      setMessage('✅ Produk berhasil ditambahkan!');
+      fetchProducts();
+      setFormData({ name: '', slug: '', description: '', price: '', stock: '', image_url: '' });
+    } catch (error) {
+      setMessage('❌ Gagal menambah produk');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-green-700">Admin Herbaprima</h1>
-      
-      {/* Form Input */}
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-8">
-        <h2 className="text-xl font-semibold mb-4">Tambah Produk Baru</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <input className="border p-2 rounded" placeholder="Nama Produk" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
-          <input className="border p-2 rounded" placeholder="Slug (url)" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} required />
-          <input className="border p-2 rounded" type="number" placeholder="Harga (Rp)" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
-          <input className="border p-2 rounded" type="number" placeholder="Stok" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
-          <input className="border p-2 rounded col-span-2" placeholder="URL Gambar" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} />
-          <textarea className="border p-2 rounded col-span-2" placeholder="Deskripsi" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+    <div className="min-h-screen bg-gray-100 py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-green-800 mb-2">🌿 Admin Herbaprima</h1>
+          <p className="text-gray-600">Kelola produk toko herbal Anda</p>
         </div>
-        <button type="submit" className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Simpan Produk</button>
-      </form>
 
-      {/* List Produk */}
-      <h2 className="text-xl font-semibold mb-4">Daftar Produk</h2>
-      <div className="grid gap-4">
-        {products.map((p: { id: number; name: string; stock: number; price: number }) => (
-          <div key={p.id} className="border p-4 rounded flex justify-between items-center">
-            <div>
-              <h3 className="font-bold">{p.name}</h3>
-              <p className="text-sm text-gray-500">Stok: {p.stock} | Harga: Rp {p.price}</p>
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Form Section */}
+          <div className="md:col-span-1">
+            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <span className="bg-green-100 text-green-600 p-2 rounded-lg mr-2">➕</span>
+                Tambah Produk
+              </h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nama Produk *</label>
+                  <input 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    placeholder="Contoh: Kopi Herbal" 
+                    value={formData.name} 
+                    onChange={e => setFormData({...formData, name: e.target.value})} 
+                    required 
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Slug (URL) *</label>
+                  <input 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    placeholder="kopi-herbal" 
+                    value={formData.slug} 
+                    onChange={e => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})} 
+                    required 
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Harga (Rp) *</label>
+                    <input 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                      type="number" 
+                      placeholder="50000" 
+                      value={formData.price} 
+                      onChange={e => setFormData({...formData, price: e.target.value})} 
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Stok *</label>
+                    <input 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                      type="number" 
+                      placeholder="100" 
+                      value={formData.stock} 
+                      onChange={e => setFormData({...formData, stock: e.target.value})} 
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
+                  <input 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    placeholder="https://..." 
+                    value={formData.image_url} 
+                    onChange={e => setFormData({...formData, image_url: e.target.value})} 
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                  <textarea 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    placeholder="Deskripsi produk..." 
+                    rows={3}
+                    value={formData.description} 
+                    onChange={e => setFormData({...formData, description: e.target.value})} 
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400"
+                >
+                  {loading ? 'Menyimpan...' : '💾 Simpan Produk'}
+                </button>
+
+                {message && (
+                  <div className={`p-3 rounded-lg text-sm ${message.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {message}
+                  </div>
+                )}
+              </form>
             </div>
-            <span className="text-xs bg-gray-100 px-2 py-1 rounded">ID: {p.id}</span>
           </div>
-        ))}
+
+          {/* List Products Section */}
+          <div className="md:col-span-2">
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <span className="bg-blue-100 text-blue-600 p-2 rounded-lg mr-2">📦</span>
+                Daftar Produk ({products.length})
+              </h2>
+
+              {products.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  <div className="text-6xl mb-4">📭</div>
+                  <p>Belum ada produk. Tambahkan produk pertama Anda!</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Produk</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Harga</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Stok</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((p) => (
+                        <tr key={p.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                          <td className="py-4 px-4">
+                            <div className="font-bold text-gray-800">{p.name}</div>
+                            <div className="text-xs text-gray-500">{p.slug}</div>
+                          </td>
+                          <td className="py-4 px-4">
+                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+                              Rp {p.price.toLocaleString('id-ID')}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4">
+                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${p.stock > 10 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
+                              {p.stock} unit
+                            </span>
+                          </td>
+                          <td className="py-4 px-4">
+                            <button className="text-red-500 hover:text-red-700 text-sm font-medium">
+                              Hapus
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
