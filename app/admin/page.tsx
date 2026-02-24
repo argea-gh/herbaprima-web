@@ -86,7 +86,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Nama Produk *</label>
                   <input 
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"  
                     placeholder="Contoh: Kopi Herbal" 
                     value={formData.name} 
                     onChange={e => setFormData({...formData, name: e.target.value})} 
@@ -97,7 +97,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Slug (URL) *</label>
                   <input 
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"  
                     placeholder="kopi-herbal" 
                     value={formData.slug} 
                     onChange={e => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})} 
@@ -109,7 +109,7 @@ export default function AdminPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Harga (Rp) *</label>
                     <input 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"  
                       type="number" 
                       placeholder="50000" 
                       value={formData.price} 
@@ -120,7 +120,7 @@ export default function AdminPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Stok *</label>
                     <input 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"  
                       type="number" 
                       placeholder="100" 
                       value={formData.stock} 
@@ -133,7 +133,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
                   <input 
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"   
                     placeholder="https://..." 
                     value={formData.image_url} 
                     onChange={e => setFormData({...formData, image_url: e.target.value})} 
@@ -143,7 +143,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
                   <textarea 
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition" 
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition"  
                     placeholder="Deskripsi produk..." 
                     rows={3}
                     value={formData.description} 
@@ -227,3 +227,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
