@@ -38,3 +38,4 @@ export async function POST(request: NextRequest, context: any) {
     return NextResponse.json({ error: "Gagal menambah produk", details: String(error) }, { status: 500 });
   }
 }
+
