@@ -2,22 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { env }: any) {
   try {
-    // @ts-ignore - Cloudflare Pages injects DB binding at runtime
-    const db = globalThis.DB;
+    const db = env.DB;
+    
+    if (!db) {
+      return NextResponse.json({ error: 'Database binding not found' }, { status: 500 });
+    }
     
     const { results } = await db.prepare("SELECT * FROM products ORDER BY created_at DESC").all();
     return NextResponse.json(results);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ 
+      error: "Failed to fetch products", 
+      details: error.message || String(error) 
+    }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest, { env }: any) {
   try {
-    // @ts-ignore - Cloudflare Pages injects DB binding at runtime
-    const db = globalThis.DB;
+    const db = env.DB;
+    
+    if (!db) {
+      return NextResponse.json({ error: 'Database binding not found' }, { status: 500 });
+    }
     
     const body = await request.json();
     await db.prepare(
@@ -25,7 +34,10 @@ export async function POST(request: NextRequest) {
     ).bind(body.name, body.slug, body.description, body.price, body.stock, body.image_url).run();
     
     return NextResponse.json({ message: "Product created" }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ 
+      error: "Failed to create product", 
+      details: error.message || String(error) 
+    }, { status: 500 });
   }
 }
