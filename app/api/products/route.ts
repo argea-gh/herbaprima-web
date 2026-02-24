@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Hapus: export const runtime = 'edge';
-
-declare global {
-  var DB: D1Database;
-}
-
 export async function GET(request: NextRequest) {
   try {
-    const db = globalThis.DB;
+    const db = (globalThis as any).DB;
     
     if (!db) {
-      return NextResponse.json({ error: 'Database binding not found' }, { status: 500 });
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
     
     const { results } = await db.prepare("SELECT * FROM products ORDER BY created_at DESC").all();
@@ -26,10 +20,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const db = globalThis.DB;
+    const db = (globalThis as any).DB;
     
     if (!db) {
-      return NextResponse.json({ error: 'Database binding not found' }, { status: 500 });
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
     
     const body = await request.json();
