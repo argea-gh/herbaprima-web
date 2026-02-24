@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-export async function GET(request: NextRequest, { env }: any) {
+export async function GET(request: NextRequest, context: any) {
   try {
-    const db = env.DB;
+    const env = context.env;
+    const db = env?.DB;
     
     if (!db) {
-      return NextResponse.json({ error: 'Database binding not found' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Database binding not found',
+        debug: { env: !!env, db: !!db }
+      }, { status: 500 });
     }
     
     const { results } = await db.prepare("SELECT * FROM products ORDER BY created_at DESC").all();
@@ -15,17 +19,22 @@ export async function GET(request: NextRequest, { env }: any) {
   } catch (error: any) {
     return NextResponse.json({ 
       error: "Failed to fetch products", 
-      details: error.message || String(error) 
+      details: error.message || String(error),
+      stack: error.stack
     }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest, { env }: any) {
+export async function POST(request: NextRequest, context: any) {
   try {
-    const db = env.DB;
+    const env = context.env;
+    const db = env?.DB;
     
     if (!db) {
-      return NextResponse.json({ error: 'Database binding not found' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Database binding not found',
+        debug: { env: !!env, db: !!db }
+      }, { status: 500 });
     }
     
     const body = await request.json();
@@ -37,7 +46,8 @@ export async function POST(request: NextRequest, { env }: any) {
   } catch (error: any) {
     return NextResponse.json({ 
       error: "Failed to create product", 
-      details: error.message || String(error) 
+      details: error.message || String(error),
+      stack: error.stack
     }, { status: 500 });
   }
 }
