@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { getProducts, createProduct } from '../actions/products';  // ← Import server actions
 
 interface Product {
   id: number;
@@ -25,44 +26,41 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch('/api/products');
-      const data = await res.json();
-      setProducts(data);
-    } catch (error) {
-      console.error('Failed to fetch products:', error);
-    }
-  };
+const fetchProducts = async () => {
+  const result = await getProducts();
+  if (result.data) {
+    setProducts(result.data);
+  }
+};
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+   e.preventDefault();
     setLoading(true);
-    setMessage('');
-    
-    try {
-      await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          price: Number(formData.price),
-          stock: Number(formData.stock)
-        }),
-      });
-      setMessage('✅ Produk berhasil ditambahkan!');
-      fetchProducts();
-      setFormData({ name: '', slug: '', description: '', price: '', stock: '', image_url: '' });
-    } catch (error) {
-      setMessage('❌ Gagal menambah produk');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  const formData = new FormData();
+  formData.append('name', formData.name);
+  formData.append('slug', formData.slug);
+  formData.append('description', formData.description);
+  formData.append('price', formData.price);
+  formData.append('stock', formData.stock);
+  formData.append('image_url', formData.image_url);
+  
+  const result = await createProduct(formData);
+  
+  if (result.success) {
+    setMessage('✅ Produk berhasil ditambahkan!');
+    fetchProducts();
+    setFormData({ name: '', slug: '', description: '', price: '', stock: '', image_url: '' });
+  } else {
+    setMessage('❌ ' + result.error);
+  }
+  
+  setLoading(false);
+};
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -227,4 +225,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
 
