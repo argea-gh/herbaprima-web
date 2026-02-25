@@ -37,24 +37,26 @@ const fetchProducts = async () => {
     fetchProducts();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-   e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setMessage('');
   
-  const formData = new FormData();
-  formData.append('name', formData.name);
-  formData.append('slug', formData.slug);
-  formData.append('description', formData.description);
-  formData.append('price', formData.price);
-  formData.append('stock', formData.stock);
-  formData.append('image_url', formData.image_url);
+  // ✅ Gunakan nama berbeda untuk FormData object
+  const fd = new FormData();
+  fd.append('name', formState.name);
+  fd.append('slug', formState.slug);
+  fd.append('description', formState.description);
+  fd.append('price', String(formState.price));
+  fd.append('stock', String(formState.stock));
+  fd.append('image_url', formState.image_url);
   
-  const result = await createProduct(formData);
+  const result = await createProduct(fd);
   
   if (result.success) {
     setMessage('✅ Produk berhasil ditambahkan!');
     fetchProducts();
-    setFormData({ name: '', slug: '', description: '', price: '', stock: '', image_url: '' });
+    setFormState({ name: '', slug: '', description: '', price: '', stock: '', image_url: '' });
   } else {
     setMessage('❌ ' + result.error);
   }
@@ -225,5 +227,6 @@ const fetchProducts = async () => {
     </div>
   );
 }
+
 
 
