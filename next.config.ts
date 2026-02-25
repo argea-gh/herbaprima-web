@@ -1,9 +1,9 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,  // ✅ Disable ESLint error saat build
+  output: 'export',
+  images: {
+    unoptimized: true,
   },
 };
 
